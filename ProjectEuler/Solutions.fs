@@ -10,6 +10,18 @@ let fibonacciSeq =
       yield! fibSeq n2 (n1 + n2) }
     fibSeq 1 2
 
+let primeSeq =
+    let rec primes n sq = seq {
+        let root = float n |> sqrt
+        let isPrime = 
+            sq 
+            |> Seq.filter(fun factor -> float factor < root)
+            |> Seq.forall (fun factor -> n % factor <> 0) 
+        if isPrime then yield n
+        yield! primes (n + 1) (if isPrime then n::sq else sq)
+    }
+    primes 2 []
+
 let problem1 = 
     let limit = 1000
     let limitSeq = Seq.takeWhile (fun n -> n < limit)
@@ -23,3 +35,11 @@ let problem2 =
     |> Seq.takeWhile(fun number -> number < 4000000)
     |> Seq.filter(fun number -> number % 2 = 0)
     |> Seq.sum
+
+let problem3 = 
+    // let input = 600851475143L
+    let input = 600851
+    primeSeq
+    |> Seq.filter (fun n -> n < input)
+//    |> Seq.filter (fun n -> input % n = 0L)
+    |> Seq.max
