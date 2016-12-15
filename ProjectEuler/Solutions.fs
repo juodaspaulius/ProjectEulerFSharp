@@ -37,9 +37,32 @@ let problem2 =
     |> Seq.sum
 
 let problem3 = 
+    let input = 600851475143L
+    // let input = 10L
+    let inputRoot = float input |> sqrt
+    let isPrime n (sq: int64 list) =
+        let root = float n |> sqrt
+        sq 
+        |> Seq.filter(fun factor -> float factor < root)
+        |> Seq.forall (fun factor -> n % factor <> 0L) 
+
+    let rec findMaxFactor input (n:int64) (sq: int64 list) currentMax = 
+        // printfn "%A %A" input n
+        if n > input then currentMax
+        else 
+            let isPrimeResult = isPrime n sq
+            let newSeq = if isPrimeResult then (n :: sq) else sq
+            if isPrimeResult && input % n = 0L then 
+                printfn "%A" n
+                findMaxFactor (input / n) (n + 1L) newSeq n
+            else 
+                findMaxFactor input (n + 1L) newSeq currentMax
+            
+
+    findMaxFactor input 2L [] 0L 
+    
     // let input = 600851475143L
-    let input = 600851
-    primeSeq
-    |> Seq.filter (fun n -> n < input)
+//    primeSeq
+//    |> Seq.filter (fun n -> n < input)
 //    |> Seq.filter (fun n -> input % n = 0L)
-    |> Seq.max
+//    |> Seq.max
