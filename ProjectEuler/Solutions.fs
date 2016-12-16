@@ -1,5 +1,7 @@
 ﻿module Solutions
 
+open System
+
 let rec integersFrom n fn = seq { 
   yield n
   yield! integersFrom (fn n) fn }
@@ -66,3 +68,12 @@ let problem3 =
 //    |> Seq.filter (fun n -> n < input)
 //    |> Seq.filter (fun n -> input % n = 0L)
 //    |> Seq.max
+
+let problem4 = 
+    [for i in [100..999] do 
+        for i2 in [i..999] do
+            let product = i * i2
+            let productString = product.ToString()
+            if String(productString.ToCharArray() |> Array.rev) = productString then
+                yield product]
+    |> Seq.max
