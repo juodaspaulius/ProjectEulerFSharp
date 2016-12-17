@@ -24,7 +24,7 @@ let primeSeq =
     }
     primes 2 []
 
-let problem1 = 
+let problem1 limit = 
     let limit = 1000
     let limitSeq = Seq.takeWhile (fun n -> n < limit)
     let seq3 = integersFrom 0 ((+) 3) |> limitSeq 
@@ -32,15 +32,16 @@ let problem1 =
     let seq15 = integersFrom 0 ((+) 15) |> limitSeq 
     (seq3 |> Seq.sum) + (seq5 |> Seq.sum) - (seq15 |> Seq.sum)
 
-let problem2 = 
+let problem2 input = 
+    let input = 4000000
     fibonacciSeq 
-    |> Seq.takeWhile(fun number -> number < 4000000)
+    |> Seq.takeWhile(fun number -> number < input)
     |> Seq.filter(fun number -> number % 2 = 0)
     |> Seq.sum
 
+
 let problem3 = 
     let input = 600851475143L
-    // let input = 10L
     let inputRoot = float input |> sqrt
     let isPrime n (sq: int64 list) =
         let root = float n |> sqrt
@@ -59,15 +60,7 @@ let problem3 =
                 findMaxFactor (input / n) (n + 1L) newSeq n
             else 
                 findMaxFactor input (n + 1L) newSeq currentMax
-            
-
     findMaxFactor input 2L [] 0L 
-    
-    // let input = 600851475143L
-//    primeSeq
-//    |> Seq.filter (fun n -> n < input)
-//    |> Seq.filter (fun n -> input % n = 0L)
-//    |> Seq.max
 
 let problem4 = 
     [for i in [100..999] do 
@@ -77,3 +70,14 @@ let problem4 =
             if String(productString.ToCharArray() |> Array.rev) = productString then
                 yield product]
     |> Seq.max
+
+// https://en.wikipedia.org/wiki/Least_common_multiple#Computing_the_least_common_multiple
+let rec gcd a b = match b with
+    | 0 -> a
+    | _ -> gcd b (a % b)
+    
+let lcm a b = (a / (gcd a b)) * b 
+
+let problem5 =
+   let sq = [1..20]
+   sq |> Seq.fold lcm 1
