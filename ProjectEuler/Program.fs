@@ -5,6 +5,6 @@ open System.IO
 let main argv = 
     printfn "%A" argv
 
-    printfn "Problem3: %A" (Solutions.problem4)
+    printfn "Problem5: %A" (Solutions.problem5)
     Console.ReadLine()
     0

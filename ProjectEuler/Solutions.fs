@@ -81,3 +81,9 @@ let lcm a b = (a / (gcd a b)) * b
 let problem5 =
    let sq = [1..20]
    sq |> Seq.fold lcm 1
+
+let problem6 =
+    let sq = [1..100]
+    let sumOfSquares = sq |> Seq.map (fun x -> x * x) |> Seq.sum
+    let squareOfSum = sq |> Seq.sum |> (fun x -> x * x)
+    squareOfSum - sumOfSquares
