@@ -17,7 +17,7 @@ let primeSeq =
         let root = float n |> sqrt
         let isPrime = 
             sq 
-            |> Seq.filter(fun factor -> float factor < root)
+            |> Seq.skipWhile(fun factor -> float factor > root)
             |> Seq.forall (fun factor -> n % factor <> 0) 
         if isPrime then yield n
         yield! primes (n + 1) (if isPrime then n::sq else sq)
@@ -87,3 +87,6 @@ let problem6 =
     let sumOfSquares = sq |> Seq.map (fun x -> x * x) |> Seq.sum
     let squareOfSum = sq |> Seq.sum |> (fun x -> x * x)
     squareOfSum - sumOfSquares
+
+let problem7 = 
+    primeSeq |> Seq.item 10000
