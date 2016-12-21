@@ -18,11 +18,11 @@ let primeSeq =
         let isPrime = 
             sq 
             |> Seq.skipWhile(fun factor -> float factor > root)
-            |> Seq.forall (fun factor -> n % factor <> 0) 
+            |> Seq.forall (fun factor -> n % factor <> 0L) 
         if isPrime then yield n
-        yield! primes (n + 1) (if isPrime then n::sq else sq)
+        yield! primes (n + 1L) (if isPrime then n::sq else sq)
     }
-    primes 2 []
+    primes 2L []
 
 let problem1 limit = 
     let limit = 1000
@@ -146,3 +146,7 @@ let problem9 =
                     yield [a; b ; c]}
     sq |> Seq.head |> Seq.fold (*) 1
                 
+let problem10 = 
+    primeSeq 
+    |> Seq.takeWhile (fun n -> n < 2000000L)
+    |> Seq.sum
