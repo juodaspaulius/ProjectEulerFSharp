@@ -134,3 +134,15 @@ let problem8 =
     |> List.ofSeq
     |> fun lst -> List.foldBack convertToIntList lst []
     |> findMaxProductSeq 13 ([], 0L)
+
+let problem9 = 
+    let sum = 1000
+    let sq = seq {
+        let limit = float sum / 3.0 |> ceil |> int
+        for a in [1 .. limit] do
+            for b in [a .. sum - a / 2] do
+                let c = sum - a - b
+                if float a ** 2.0 + float b ** 2.0 = float c ** 2.0 then
+                    yield [a; b ; c]}
+    sq |> Seq.head |> Seq.fold (*) 1
+                
