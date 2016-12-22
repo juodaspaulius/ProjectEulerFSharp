@@ -1,6 +1,7 @@
 ﻿module Solutions
 
 open System
+open System.IO
 
 let rec integersFrom n fn = seq { 
   yield n
@@ -150,3 +151,40 @@ let problem10 =
     primeSeq 
     |> Seq.takeWhile (fun n -> n < 2000000L)
     |> Seq.sum
+
+let readLines filePath = System.IO.File.ReadLines(filePath)
+let baseDirectoryPath = __SOURCE_DIRECTORY__
+let baseDirectory = Directory.CreateDirectory(baseDirectoryPath)
+
+let problem11 = 
+    let limit = 4
+    let fullPath = Path.Combine(baseDirectory.FullName, "Problem11.txt")
+    let grid = 
+        readLines fullPath 
+        |> Seq.map (fun line -> line.Split(' ') |> Seq.map(System.Int32.Parse))
+        |> Seq.concat
+        |> List.ofSeq
+    let gridSize = grid |> List.length |> float |> sqrt |> Math.Round |> Convert.ToInt32
+    let findProduct index _ =
+        let calcRight = 
+            if gridSize - index % gridSize >= limit then 
+                [0 .. limit-1] |> Seq.fold (fun s i-> s * grid.[i + index]) 1 
+            else 0
+        let calcDown = 
+            if gridSize - (index / gridSize) >= limit then
+                [0 .. limit-1] |> Seq.fold (fun s i -> s * grid.[gridSize * i + index]) 1 
+            else 0
+        let calcDiag1 =
+            if gridSize - index % gridSize  >= limit && gridSize - (index / gridSize) >= limit then
+                [0 .. limit-1] |> Seq.fold (fun s i -> s * grid.[index + gridSize * i + i]) 1 
+            else 0
+        let calcDiag2 =
+            if index % gridSize + 1  >= limit && gridSize - (index / gridSize) >= limit then
+                [0 .. limit-1] |> Seq.fold (fun s i -> s * grid.[index + gridSize * i - i]) 1 
+            else 0
+        [calcRight; calcDown; calcDiag1; calcDiag2] 
+        |> Seq.max
+        |> (fun m -> printfn "%A %A" index m; index, m)
+    grid 
+    |> Seq.mapi findProduct
+    |> Seq.maxBy snd

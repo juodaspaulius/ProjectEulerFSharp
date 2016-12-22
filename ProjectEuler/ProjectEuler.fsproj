@@ -56,6 +56,8 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <None Include="App.config" />
+    <Content Include="Problem11.txt" />
+    <Content Include="Problem11_2.txt" />
     <Compile Include="Solutions.fs" />
     <None Include="Script.fsx" />
     <Content Include="packages.config" />
