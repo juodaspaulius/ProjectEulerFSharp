@@ -25,6 +25,12 @@ let primeSeq =
     }
     primes 2L []
 
+let rec seqStep n step = seq {
+        if n = 3 then yield 2
+        yield n
+        yield! seqStep n + step
+    }
+
 let problem1 limit = 
     let limit = 1000
     let limitSeq = Seq.takeWhile (fun n -> n < limit)
@@ -188,3 +194,36 @@ let problem11 =
     grid 
     |> Seq.mapi findProduct
     |> Seq.maxBy snd
+
+let problem12 =
+    let rec triangleSeq i n = 
+        seq {
+            yield n + i
+            yield! triangleSeq (i + 1) (n+i)
+        }
+    let countDivisors n =
+        let middle = float n |> sqrt |> Math.Floor |> Convert.ToInt32
+        [1..middle] 
+        |> Seq.filter (fun i -> n % i = 0) 
+        |> Seq.length
+        |> ( * ) 2
+    triangleSeq 1 0
+    |> Seq.find (fun i -> countDivisors i > 500)
+
+let problem13 =
+    let fullPath = Path.Combine(baseDirectory.FullName, "Problem13.txt")
+    let splitLongNumber (n:string) = 
+        [0..4] 
+        |> Seq.map (fun i -> n.[i*10..i*10+9] |> System.Int64.Parse)
+        |> List.ofSeq
+    let numbers = 
+        readLines fullPath 
+        |> Seq.map splitLongNumber
+    let countColumnOverflow (s, overflow) i =
+        numbers 
+        |> Seq.fold (fun s t -> t.[i] + s) overflow
+        |> fun i -> (i, i / (Convert.ToInt64 (10.0 ** 10.0)))
+    [4.. -1 .. 0]
+    |> Seq.fold countColumnOverflow (0L, 0L)
+    |> fst
+    |> (fun (f:Int64) -> f.ToString().[0..9])
