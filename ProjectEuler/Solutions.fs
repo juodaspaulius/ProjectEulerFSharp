@@ -2,6 +2,8 @@
 
 open System
 open System.IO
+open System.Collections
+open System.Collections.Generic
 
 let rec integersFrom n fn = seq { 
   yield n
@@ -24,14 +26,14 @@ let primeSeq =
         yield! primes (n + 1L) (if isPrime then n::sq else sq)
     }
     primes 2L []
-
-let rec seqStep n step = seq {
-        if n = 3 then yield 2
-        yield n
-        yield! seqStep n + step
-    }
-
-let problem1 limit = 
+//
+//let rec seqStep n step = seq {
+//        if n = 3 then yield 2
+//        yield n
+//        yield! seqStep n + step
+//    }
+//
+let problem1() = 
     let limit = 1000
     let limitSeq = Seq.takeWhile (fun n -> n < limit)
     let seq3 = integersFrom 0 ((+) 3) |> limitSeq 
@@ -39,7 +41,7 @@ let problem1 limit =
     let seq15 = integersFrom 0 ((+) 15) |> limitSeq 
     (seq3 |> Seq.sum) + (seq5 |> Seq.sum) - (seq15 |> Seq.sum)
 
-let problem2 input = 
+let problem2() = 
     let input = 4000000
     fibonacciSeq 
     |> Seq.takeWhile(fun number -> number < input)
@@ -47,7 +49,7 @@ let problem2 input =
     |> Seq.sum
 
 
-let problem3 = 
+let problem3() = 
     let input = 600851475143L
     let inputRoot = float input |> sqrt
     let isPrime n (sq: int64 list) =
@@ -69,7 +71,7 @@ let problem3 =
                 findMaxFactor input (n + 1L) newSeq currentMax
     findMaxFactor input 2L [] 0L 
 
-let problem4 = 
+let problem4() = 
     [for i in [100..999] do 
         for i2 in [i..999] do
             let product = i * i2
@@ -85,18 +87,18 @@ let rec gcd a b = match b with
     
 let lcm a b = (a / (gcd a b)) * b 
 
-let problem5 =
+let problem5() =
    let sq = [1..20]
    sq |> Seq.fold lcm 1
 
-let problem6 =
+let problem6() =
     let sq = [1..100]
     let sumOfSquares = sq |> Seq.map (fun x -> x * x) |> Seq.sum
     let squareOfSum = sq |> Seq.sum |> (fun x -> x * x)
     squareOfSum - sumOfSquares
 
-let problem7 = 
-    primeSeq |> Seq.item 10000
+// let problem7() = 
+//    primeSeq |> Seq.item 10000
 
 let rec findMaxProductSeq seqCount currentResult lst = 
     match lst with
@@ -109,7 +111,7 @@ let rec findMaxProductSeq seqCount currentResult lst =
         | (_, product) when newProduct > product -> findMaxProductSeq seqCount (newDigits, newProduct) xs
         | _ -> findMaxProductSeq seqCount currentResult xs
 
-let problem8 =
+let problem8() =
     let input = [
         "73167176531330624919225119674426574742355349194934";
         "96983520312774506326239578318016984801869478851843";
@@ -142,7 +144,7 @@ let problem8 =
     |> fun lst -> List.foldBack convertToIntList lst []
     |> findMaxProductSeq 13 ([], 0L)
 
-let problem9 = 
+let problem9() = 
     let sum = 1000
     let sq = seq {
         let limit = float sum / 3.0 |> ceil |> int
@@ -153,7 +155,7 @@ let problem9 =
                     yield [a; b ; c]}
     sq |> Seq.head |> Seq.fold (*) 1
                 
-let problem10 = 
+let problem10() = 
     primeSeq 
     |> Seq.takeWhile (fun n -> n < 2000000L)
     |> Seq.sum
@@ -162,7 +164,7 @@ let readLines filePath = System.IO.File.ReadLines(filePath)
 let baseDirectoryPath = __SOURCE_DIRECTORY__
 let baseDirectory = Directory.CreateDirectory(baseDirectoryPath)
 
-let problem11 = 
+let problem11() = 
     let limit = 4
     let fullPath = Path.Combine(baseDirectory.FullName, "Problem11.txt")
     let grid = 
@@ -195,7 +197,7 @@ let problem11 =
     |> Seq.mapi findProduct
     |> Seq.maxBy snd
 
-let problem12 =
+let problem12() =
     let rec triangleSeq i n = 
         seq {
             yield n + i
@@ -210,7 +212,7 @@ let problem12 =
     triangleSeq 1 0
     |> Seq.find (fun i -> countDivisors i > 500)
 
-let problem13 =
+let problem13() =
     let fullPath = Path.Combine(baseDirectory.FullName, "Problem13.txt")
     let splitLongNumber (n:string) = 
         [0..4] 
@@ -227,3 +229,51 @@ let problem13 =
     |> Seq.fold countColumnOverflow (0L, 0L)
     |> fst
     |> (fun (f:Int64) -> f.ToString().[0..9])
+
+    
+let memoize f keyFn =
+    let cache = System.Collections.Generic.Dictionary<'a,'b>()
+    let rec g x = h g x
+    and h r x =
+        let key = keyFn x
+        match cache.TryGetValue(key) with
+        | (true, v) -> v// printfn "Cache hit: %A %A" key v; v
+        | _ -> 
+            let v = f g x
+            // printfn "Cache save: %A %A" key v
+            cache.Add(key, v)
+            v
+    g
+
+
+let problem14() =
+//    let rec collatzSize f n =
+//        // printfn "%A" n
+//        if n <> 1 then
+//            if n % 2 = 0 then 1 + f (n / 2)
+//            else 1 + f (3 * n + 1)
+//        else 1
+//    
+//    let cachedCollatz = memoize collatzSize id
+
+    let cache = System.Collections.Generic.Dictionary<'a,'b>()
+    let rec collatzSize =
+        let rec helper n f = 
+            match n, cache.TryGetValue(n) with
+            | 1, _ -> f 1
+            | _, (true, v) ->
+//                printfn "Using cache: %A %A" n v
+                f v
+            | _, _ -> 
+                let newN = if n % 2 = 0 then (n / 2) else (3 * n + 1)
+                // printfn "New N: %A" newN
+                helper newN (fun c -> 
+                    let total = c + 1
+                    cache.Add(n, total)
+//                    printfn "Adding to cache: %A %A" n total
+                    f total)
+        fun n -> helper n id
+
+    [1..999999]
+    |> List.map(fun i -> (i, collatzSize i))
+    |> Seq.maxBy snd
